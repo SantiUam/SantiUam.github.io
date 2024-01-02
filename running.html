@@ -54,6 +54,14 @@
             background-color: #333;
             color: #fff;
         }
+
+        #resumen {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            margin-top: 20px;
+        }
     </style>
 </head>
 <body>
@@ -90,6 +98,13 @@
         </tbody>
     </table>
 
+    <div id="resumen">
+        <h2>Resumen</h2>
+        <p>Total Kilómetros Recorridos: <span id="totalKilometros">0</span></p>
+        <p>Total Horas Corridas: <span id="totalHoras">0</span></p>
+        <p>Número de Veces Corridas: <span id="numeroVeces">0</span></p>
+    </div>
+
     <script>
         let entradaNumero = 1; // Contador para el número de entrada
 
@@ -123,6 +138,7 @@
                     });
 
                     entradaNumero = registrosGuardados.length + 1;
+                    actualizarResumen(registrosGuardados);
                 })
                 .catch(error => console.error('Error al cargar registros:', error));
         }
@@ -189,10 +205,29 @@
             registrosGuardados.push(nuevoRegistro);
             guardarRegistro(registrosGuardados);
 
+            // Actualizar el resumen
+            actualizarResumen(registrosGuardados);
+
             // Limpiar los campos del formulario
             document.getElementById('minutos').value = '';
             document.getElementById('segundos').value = '';
             document.getElementById('velocidad').value = '';
+        }
+
+        function actualizarResumen(registros) {
+            const totalKilometrosElement = document.getElementById('totalKilometros');
+            const totalHorasElement = document.getElementById('totalHoras');
+            const numeroVecesElement = document.getElementById('numeroVeces');
+
+            const totalKilometros = registros.reduce((total, registro) => total + parseFloat(registro.distanciaRecorrida), 0);
+            const totalHoras = registros.reduce((total, registro) => {
+                const tiempoSplit = registro.tiempo.split(':');
+                return total + parseFloat(tiempoSplit[0]) + parseFloat(tiempoSplit[1]) / 60;
+            }, 0);
+
+            totalKilometrosElement.textContent = totalKilometros.toFixed(2);
+            totalHorasElement.textContent = totalHoras.toFixed(2);
+            numeroVecesElement.textContent = registros.length;
         }
     </script>
 
