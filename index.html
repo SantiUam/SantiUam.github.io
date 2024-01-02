@@ -32,16 +32,15 @@
             background-color: #fff;
             border-radius: 8px;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-            display: flex;
-            justify-content: space-between; /* Alinea las cajas en los extremos */
-            align-items: center; /* Centra verticalmente en el contenedor */
+            text-align: center; /* Centra las cajas en el contenedor */
         }
 
         .image-box {
-            flex: 1; /* Hace que las cajas ocupen el mismo espacio */
+            display: inline-block; /* Muestra las cajas en línea */
             border: 1px solid #ddd;
             border-radius: 8px;
             overflow: hidden;
+            margin: 0 10px 20px; /* Agrega margen a las cajas */
             cursor: pointer;
             transition: transform 0.3s ease-in-out;
             vertical-align: top; /* Alinea las imágenes en la parte superior */
@@ -91,3 +90,4 @@
 
 </body>
 </html>
+
