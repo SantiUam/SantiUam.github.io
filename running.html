@@ -67,7 +67,7 @@
         <input type="number" id="segundos" required>
         <br>
 
-        <label for="velocidad">Velocidad (metros/segundo):</label>
+        <label for="velocidad">Velocidad (km/h):</label>
         <input type="number" id="velocidad" required>
         <br>
 
@@ -81,7 +81,7 @@
             <tr>
                 <th>Número de Entrada</th>
                 <th>Tiempo (min:seg)</th>
-                <th>Velocidad (m/s)</th>
+                <th>Velocidad (km/h)</th>
                 <th>Distancia Recorrida (metros)</th>
             </tr>
         </thead>
@@ -153,15 +153,18 @@
         function registrarDatos() {
             const minutos = parseInt(document.getElementById('minutos').value);
             const segundos = parseInt(document.getElementById('segundos').value);
-            const velocidad = parseFloat(document.getElementById('velocidad').value);
+            const velocidadKmH = parseFloat(document.getElementById('velocidad').value);
 
-            if (isNaN(minutos) || isNaN(segundos) || isNaN(velocidad)) {
+            if (isNaN(minutos) || isNaN(segundos) || isNaN(velocidadKmH)) {
                 alert('Por favor, ingrese valores numéricos válidos.');
                 return;
             }
 
+            // Convertir velocidad de km/h a m/s
+            const velocidadMS = velocidadKmH * (1000 / 3600);
+
             const tiempoTotalSegundos = minutos * 60 + segundos;
-            const distanciaRecorrida = velocidad * tiempoTotalSegundos;
+            const distanciaRecorrida = velocidadMS * tiempoTotalSegundos;
 
             const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
@@ -172,13 +175,13 @@
 
             cellNumeroEntrada.innerHTML = entradaNumero;
             cellTiempo.innerHTML = `${minutos}:${segundos}`;
-            cellVelocidad.innerHTML = velocidad;
+            cellVelocidad.innerHTML = velocidadKmH;
             cellDistanciaRecorrida.innerHTML = distanciaRecorrida.toFixed(2);
 
             const nuevoRegistro = {
                 numeroEntrada: entradaNumero,
                 tiempo: `${minutos}:${segundos}`,
-                velocidad: velocidad,
+                velocidad: velocidadKmH,
                 distanciaRecorrida: distanciaRecorrida.toFixed(2),
             };
 
@@ -198,3 +201,4 @@
 
 </body>
 </html>
+
