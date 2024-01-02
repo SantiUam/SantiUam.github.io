@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -44,7 +45,8 @@
             margin-top: 20px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #ddd;
             padding: 10px;
             text-align: center;
@@ -64,18 +66,21 @@
         }
     </style>
 </head>
+
 <body>
 
     <h1>Registro de Tiempo y Velocidad</h1>
 
     <form id="registroForm">
+        <label for="horas">Horas:</label>
+        <input type="number" id="horas" required>
         <label for="minutos">Minutos:</label>
         <input type="number" id="minutos" required>
         <label for="segundos">Segundos:</label>
         <input type="number" id="segundos" required>
         <br>
 
-        <label for="velocidad">Velocidad (metros/segundo):</label>
+        <label for="velocidad">Velocidad (km/h):</label>
         <input type="number" id="velocidad" required>
         <br>
 
@@ -88,8 +93,8 @@
         <thead>
             <tr>
                 <th>Número de Entrada</th>
-                <th>Tiempo (min:seg)</th>
-                <th>Velocidad (m/s)</th>
+                <th>Tiempo (hor:min:seg)</th>
+                <th>Velocidad (km/h)</th>
                 <th>Distancia Recorrida (metros)</th>
             </tr>
         </thead>
@@ -109,7 +114,7 @@
         let entradaNumero = 1; // Contador para el número de entrada
 
         // Cargar registros almacenados en GitHub Gists al cargar la página
-        window.onload = function() {
+        window.onload = function () {
             cargarRegistrosGuardados();
         };
 
@@ -148,88 +153,4 @@
             const gistUrl = `https://api.github.com/gists/${gistId}`;
 
             // Guardar registros en GitHub Gists
-            fetch(gistUrl, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    files: {
-                        'registros.json': {
-                            content: JSON.stringify(registros),
-                        },
-                    },
-                }),
-            })
-                .then(response => response.json())
-                .then(data => console.log('Registros guardados en GitHub Gists:', data))
-                .catch(error => console.error('Error al guardar registros:', error));
-        }
-
-        function registrarDatos() {
-            const minutos = parseInt(document.getElementById('minutos').value);
-            const segundos = parseInt(document.getElementById('segundos').value);
-            const velocidad = parseFloat(document.getElementById('velocidad').value);
-
-            if (isNaN(minutos) || isNaN(segundos) || isNaN(velocidad)) {
-                alert('Por favor, ingrese valores numéricos válidos.');
-                return;
-            }
-
-            const tiempoTotalSegundos = minutos * 60 + segundos;
-            const distanciaRecorrida = velocidad * tiempoTotalSegundos;
-
-            const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
-            const newRow = table.insertRow();
-            const cellNumeroEntrada = newRow.insertCell(0);
-            const cellTiempo = newRow.insertCell(1);
-            const cellVelocidad = newRow.insertCell(2);
-            const cellDistanciaRecorrida = newRow.insertCell(3);
-
-            cellNumeroEntrada.innerHTML = entradaNumero;
-            cellTiempo.innerHTML = `${minutos}:${segundos}`;
-            cellVelocidad.innerHTML = velocidad;
-            cellDistanciaRecorrida.innerHTML = distanciaRecorrida.toFixed(2);
-
-            const nuevoRegistro = {
-                numeroEntrada: entradaNumero,
-                tiempo: `${minutos}:${segundos}`,
-                velocidad: velocidad,
-                distanciaRecorrida: distanciaRecorrida.toFixed(2),
-            };
-
-            entradaNumero++;
-
-            // Obtener registros guardados, agregar el nuevo registro y guardar nuevamente
-            const registrosGuardados = JSON.parse(localStorage.getItem('registros')) || [];
-            registrosGuardados.push(nuevoRegistro);
-            guardarRegistro(registrosGuardados);
-
-            // Actualizar el resumen
-            actualizarResumen(registrosGuardados);
-
-            // Limpiar los campos del formulario
-            document.getElementById('minutos').value = '';
-            document.getElementById('segundos').value = '';
-            document.getElementById('velocidad').value = '';
-        }
-
-        function actualizarResumen(registros) {
-            const totalKilometrosElement = document.getElementById('totalKilometros');
-            const totalHorasElement = document.getElementById('totalHoras');
-            const numeroVecesElement = document.getElementById('numeroVeces');
-
-            const totalKilometros = registros.reduce((total, registro) => total + parseFloat(registro.distanciaRecorrida), 0);
-            const totalHoras = registros.reduce((total, registro) => {
-                const tiempoSplit = registro.tiempo.split(':');
-                return total + parseFloat(tiempoSplit[0]) + parseFloat(tiempoSplit[1]) / 60;
-            }, 0);
-
-            totalKilometrosElement.textContent = totalKilometros.toFixed(2);
-            totalHorasElement.textContent = totalHoras.toFixed(2);
-            numeroVecesElement.textContent = registros.length;
-        }
-    </script>
-
-</body>
-</html>
+            fetch(gistUrl
