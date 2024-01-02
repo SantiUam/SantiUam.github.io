@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deportes Fantásticos</title>
+    <title>Entrenamiento Santi</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -38,6 +38,25 @@
             margin-bottom: 30px;
         }
 
+        .image-box {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .image-box:hover {
+            transform: scale(1.05);
+        }
+
+        .image-box img {
+            width: 100%;
+            height: auto;
+            border-bottom: 1px solid #ddd;
+        }
+
         footer {
             background-color: #333;
             color: #fff;
@@ -49,26 +68,25 @@
 <body>
 
     <header>
-        <h1>Deportes Fantásticos</h1>
-        <p>Explora las últimas noticias y actualizaciones deportivas</p>
+        <h1>Entrenamiento Santi</h1>
     </header>
 
     <section>
-        <article class="article">
-            <h2>El equipo local celebra una victoria emocionante</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec odio eu est aliquet dignissim.</p>
-            <a href="#">Leer más</a>
-        </article>
+        <div class="image-box" onclick="window.location.href='pagina1.html'">
+            <img src="imagen1.jpg" alt="Imagen 1">
+        </div>
 
-        <article class="article">
-            <h2>Campeonato mundial: Resultados destacados</h2>
-            <p>Proin at justo ac nulla consectetur fermentum in sed elit. Curabitur vel justo ut urna vestibulum.</p>
-            <a href="#">Leer más</a>
-        </article>
+        <div class="image-box" onclick="window.location.href='pagina2.html'">
+            <img src="imagen2.jpg" alt="Imagen 2">
+        </div>
+
+        <div class="image-box" onclick="window.location.href='pagina3.html'">
+            <img src="imagen3.jpg" alt="Imagen 3">
+        </div>
     </section>
 
     <footer>
-        <p>&copy; 2024 Deportes Fantásticos</p>
+        <p>&copy; 2Entrenamiento Santi</p>
     </footer>
 
 </body>
