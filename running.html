@@ -8,21 +8,51 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        form {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        label {
+            margin-right: 5px;
+        }
+
+        input {
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+
+        button {
+            padding: 8px;
+            background-color: #333;
+            color: #fff;
+            border: none;
+            cursor: pointer;
         }
 
         table {
             border-collapse: collapse;
             width: 100%;
+            margin-top: 20px;
         }
 
         th, td {
             border: 1px solid #ddd;
-            padding: 8px;
-            text-align: left;
+            padding: 10px;
+            text-align: center;
         }
 
         th {
-            background-color: #f2f2f2;
+            background-color: #333;
+            color: #fff;
         }
     </style>
 </head>
@@ -31,8 +61,10 @@
     <h1>Registro de Tiempo y Velocidad</h1>
 
     <form id="registroForm">
-        <label for="tiempo">Tiempo (segundos):</label>
-        <input type="number" id="tiempo" required>
+        <label for="minutos">Minutos:</label>
+        <input type="number" id="minutos" required>
+        <label for="segundos">Segundos:</label>
+        <input type="number" id="segundos" required>
         <br>
 
         <label for="velocidad">Velocidad (metros/segundo):</label>
@@ -48,8 +80,9 @@
         <thead>
             <tr>
                 <th>Número de Entrada</th>
-                <th>Tiempo (s)</th>
+                <th>Tiempo (min:seg)</th>
                 <th>Velocidad (m/s)</th>
+                <th>Distancia Recorrida (metros)</th>
             </tr>
         </thead>
         <tbody>
@@ -61,32 +94,42 @@
         let entradaNumero = 1; // Contador para el número de entrada
 
         function registrarDatos() {
-            // Obtener los valores de tiempo y velocidad del formulario
-            const tiempo = parseFloat(document.getElementById('tiempo').value);
+            // Obtener los valores de minutos, segundos y velocidad del formulario
+            const minutos = parseInt(document.getElementById('minutos').value);
+            const segundos = parseInt(document.getElementById('segundos').value);
             const velocidad = parseFloat(document.getElementById('velocidad').value);
 
             // Validar que se ingresaron valores numéricos
-            if (isNaN(tiempo) || isNaN(velocidad)) {
+            if (isNaN(minutos) || isNaN(segundos) || isNaN(velocidad)) {
                 alert('Por favor, ingrese valores numéricos válidos.');
                 return;
             }
 
+            // Calcular el tiempo total en segundos
+            const tiempoTotalSegundos = minutos * 60 + segundos;
+
+            // Calcular la distancia recorrida en metros
+            const distanciaRecorrida = velocidad * tiempoTotalSegundos;
+
             // Crear una nueva fila en la tabla
             const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
-            
+
             // Insertar celdas con los datos
             const cellNumeroEntrada = newRow.insertCell(0);
             const cellTiempo = newRow.insertCell(1);
             const cellVelocidad = newRow.insertCell(2);
+            const cellDistanciaRecorrida = newRow.insertCell(3);
 
             // Asignar valores a las celdas
             cellNumeroEntrada.innerHTML = entradaNumero++;
-            cellTiempo.innerHTML = tiempo;
+            cellTiempo.innerHTML = `${minutos}:${segundos}`;
             cellVelocidad.innerHTML = velocidad;
+            cellDistanciaRecorrida.innerHTML = distanciaRecorrida.toFixed(2);
 
             // Limpiar los campos del formulario
-            document.getElementById('tiempo').value = '';
+            document.getElementById('minutos').value = '';
+            document.getElementById('segundos').value = '';
             document.getElementById('velocidad').value = '';
         }
     </script>
