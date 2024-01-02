@@ -93,39 +93,101 @@
     <script>
         let entradaNumero = 1; // Contador para el número de entrada
 
+        // Cargar registros almacenados en GitHub Gists al cargar la página
+        window.onload = function() {
+            cargarRegistrosGuardados();
+        };
+
+        function cargarRegistrosGuardados() {
+            const gistId = 'tu_gist_id'; // Reemplaza con tu ID de Gist
+            const gistUrl = `https://api.github.com/gists/${gistId}`;
+
+            // Obtener registros guardados de GitHub Gists
+            fetch(gistUrl)
+                .then(response => response.json())
+                .then(data => {
+                    const registrosGuardados = JSON.parse(data.files['registros.json'].content) || [];
+                    const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
+
+                    registrosGuardados.forEach(registro => {
+                        const newRow = table.insertRow();
+                        const cellNumeroEntrada = newRow.insertCell(0);
+                        const cellTiempo = newRow.insertCell(1);
+                        const cellVelocidad = newRow.insertCell(2);
+                        const cellDistanciaRecorrida = newRow.insertCell(3);
+
+                        cellNumeroEntrada.innerHTML = registro.numeroEntrada;
+                        cellTiempo.innerHTML = registro.tiempo;
+                        cellVelocidad.innerHTML = registro.velocidad;
+                        cellDistanciaRecorrida.innerHTML = registro.distanciaRecorrida;
+                    });
+
+                    entradaNumero = registrosGuardados.length + 1;
+                })
+                .catch(error => console.error('Error al cargar registros:', error));
+        }
+
+        function guardarRegistro(registros) {
+            const gistId = 'tu_gist_id'; // Reemplaza con tu ID de Gist
+            const gistUrl = `https://api.github.com/gists/${gistId}`;
+
+            // Guardar registros en GitHub Gists
+            fetch(gistUrl, {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    files: {
+                        'registros.json': {
+                            content: JSON.stringify(registros),
+                        },
+                    },
+                }),
+            })
+                .then(response => response.json())
+                .then(data => console.log('Registros guardados en GitHub Gists:', data))
+                .catch(error => console.error('Error al guardar registros:', error));
+        }
+
         function registrarDatos() {
-            // Obtener los valores de minutos, segundos y velocidad del formulario
             const minutos = parseInt(document.getElementById('minutos').value);
             const segundos = parseInt(document.getElementById('segundos').value);
             const velocidad = parseFloat(document.getElementById('velocidad').value);
 
-            // Validar que se ingresaron valores numéricos
             if (isNaN(minutos) || isNaN(segundos) || isNaN(velocidad)) {
                 alert('Por favor, ingrese valores numéricos válidos.');
                 return;
             }
 
-            // Calcular el tiempo total en segundos
             const tiempoTotalSegundos = minutos * 60 + segundos;
-
-            // Calcular la distancia recorrida en metros
             const distanciaRecorrida = velocidad * tiempoTotalSegundos;
 
-            // Crear una nueva fila en la tabla
             const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
             const newRow = table.insertRow();
-
-            // Insertar celdas con los datos
             const cellNumeroEntrada = newRow.insertCell(0);
             const cellTiempo = newRow.insertCell(1);
             const cellVelocidad = newRow.insertCell(2);
             const cellDistanciaRecorrida = newRow.insertCell(3);
 
-            // Asignar valores a las celdas
-            cellNumeroEntrada.innerHTML = entradaNumero++;
+            cellNumeroEntrada.innerHTML = entradaNumero;
             cellTiempo.innerHTML = `${minutos}:${segundos}`;
             cellVelocidad.innerHTML = velocidad;
             cellDistanciaRecorrida.innerHTML = distanciaRecorrida.toFixed(2);
+
+            const nuevoRegistro = {
+                numeroEntrada: entradaNumero,
+                tiempo: `${minutos}:${segundos}`,
+                velocidad: velocidad,
+                distanciaRecorrida: distanciaRecorrida.toFixed(2),
+            };
+
+            entradaNumero++;
+
+            // Obtener registros guardados, agregar el nuevo registro y guardar nuevamente
+            const registrosGuardados = JSON.parse(localStorage.getItem('registros')) || [];
+            registrosGuardados.push(nuevoRegistro);
+            guardarRegistro(registrosGuardados);
 
             // Limpiar los campos del formulario
             document.getElementById('minutos').value = '';
