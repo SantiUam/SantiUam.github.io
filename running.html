@@ -67,6 +67,9 @@
     </style>
     <!-- Enlaces a las bibliotecas de Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Configuración de Firebase -->
+    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.5.0/firebase-database.js"></script>
 </head>
 
 <body>
@@ -125,13 +128,42 @@
     <canvas id="graficaVelocidad" width="400" height="200"></canvas>
 
     <script>
+        // Reemplaza con la configuración de tu proyecto Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyeAX9oLPZsr-BYtxq0dXmaR2oA7_NjOk",
+            authDomain: "datossanti-1e317.firebaseapp.com",
+            projectId: "datossanti-1e317",
+            storageBucket: "datossanti-1e317.appspot.com",
+            messagingSenderId: "935297859254",
+            appId: "1:935297859254:web:dae7752c0e46e670103017",
+            measurementId: "G-BJ3VT3BB98"
+        };      
+
+        // Inicializa Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Obtiene una referencia a la base de datos
+        const database = firebase.database();
         let entradaNumero = 1; // Contador para el número de entrada
         let registrosGuardados = [];
 
         // Cargar registros almacenados en el almacenamiento local al cargar la página
         window.onload = function () {
             cargarRegistrosGuardados();
-            generarGraficas(registrosGuardados);
+        generarGraficas(registrosGuardados);
+
+        // Recuperar datos desde Firebase
+        const registrosRef = database.ref('registros');
+        registrosRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                const registros = Object.values(data);
+                // Actualizar la tabla y gráficas con los registros recuperados
+                // Puedes utilizar las funciones existentes como cargarRegistrosGuardados y generarGraficas
+                cargarRegistrosGuardados();
+                generarGraficas(registrosGuardados);
+            }
+        });
         };
 
         function cargarRegistrosGuardados() {
@@ -165,16 +197,29 @@
             }
 
             const tiempoTotalSegundos = horas * 3600 + minutos * 60 + segundos;
-            const velocidadMetrosSegundo = velocidad / 3.6; // Convertir de km/h a m/s
-            const distanciaRecorrida = velocidadMetrosSegundo * tiempoTotalSegundos / 1000; // Convertir de metros a kilómetros
+            const velocidadMetrosSegundo = velocidad / 3.6;
+            const distanciaRecorrida = velocidadMetrosSegundo * tiempoTotalSegundos / 1000;
 
-            const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
             const nuevoRegistro = {
                 numeroEntrada: entradaNumero,
                 tiempo: `${horas}:${minutos}:${segundos}`,
                 velocidad: velocidad,
                 distanciaRecorrida: distanciaRecorrida.toFixed(2),
-            };
+        };
+
+    // Guarda el nuevo registro en Firebase
+    const registrosRef = database.ref('registros');
+    registrosRef.push(nuevoRegistro);
+
+    entradaNumero++;
+
+    // Limpiar los campos del formulario
+    document.getElementById('horas').value = '';
+    document.getElementById('minutos').value = '';
+    document.getElementById('segundos').value = '';
+    document.getElementById('velocidad').value = '';
+}
+
 
             agregarFilaTabla(table, nuevoRegistro);
 
@@ -192,7 +237,7 @@
             document.getElementById('minutos').value = '';
             document.getElementById('segundos').value = '';
             document.getElementById('velocidad').value = '';
-        }
+        
 
         function agregarFilaTabla(table, registro) {
             const newRow = table.insertRow();
@@ -315,6 +360,8 @@
             }
         }
     </script>
+
+    
 </body>
 
 </html>
