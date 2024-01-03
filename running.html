@@ -65,6 +65,8 @@
             margin-top: 20px;
         }
     </style>
+    <!-- Enlaces a las bibliotecas de Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
 <body>
@@ -95,7 +97,7 @@
                 <th>Número de Entrada</th>
                 <th>Tiempo (hor:min:seg)</th>
                 <th>Velocidad (km/h)</th>
-                <th>Distancia Recorrida (metros)</th>
+                <th>Distancia Recorrida (kilómetros)</th>
             </tr>
         </thead>
         <tbody>
@@ -110,47 +112,179 @@
         <p>Número de Veces Corridas: <span id="numeroVeces">0</span></p>
     </div>
 
+    <canvas id="graficaKilometros" width="400" height="200"></canvas>
+    <canvas id="graficaVelocidad" width="400" height="200"></canvas>
+
     <script>
         let entradaNumero = 1; // Contador para el número de entrada
+        let registrosGuardados = [];
 
-        // Cargar registros almacenados en GitHub Gists al cargar la página
+        // Cargar registros almacenados en el almacenamiento local al cargar la página
         window.onload = function () {
             cargarRegistrosGuardados();
+            generarGraficas(registrosGuardados);
         };
 
         function cargarRegistrosGuardados() {
-            const gistId = 'dd3af2ba049e579e096ca7e8dd6f0dde'; // Reemplaza con tu ID de Gist
-            const gistUrl = `https://api.github.com/gists/${gistId}`;
+            registrosGuardados = JSON.parse(localStorage.getItem('registros')) || [];
+            const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
 
-            // Obtener registros guardados de GitHub Gists
-            fetch(gistUrl)
-                .then(response => response.json())
-                .then(data => {
-                    const registrosGuardados = JSON.parse(data.files['registros.json'].content) || [];
-                    const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
+            registrosGuardados.forEach(registro => {
+                agregarFilaTabla(table, registro);
+            });
 
-                    registrosGuardados.forEach(registro => {
-                        const newRow = table.insertRow();
-                        const cellNumeroEntrada = newRow.insertCell(0);
-                        const cellTiempo = newRow.insertCell(1);
-                        const cellVelocidad = newRow.insertCell(2);
-                        const cellDistanciaRecorrida = newRow.insertCell(3);
+            entradaNumero = registrosGuardados.length + 1;
 
-                        cellNumeroEntrada.innerHTML = registro.numeroEntrada;
-                        cellTiempo.innerHTML = registro.tiempo;
-                        cellVelocidad.innerHTML = registro.velocidad;
-                        cellDistanciaRecorrida.innerHTML = registro.distanciaRecorrida;
-                    });
-
-                    entradaNumero = registrosGuardados.length + 1;
-                    actualizarResumen(registrosGuardados);
-                })
-                .catch(error => console.error('Error al cargar registros:', error));
+            // Actualizar el resumen
+            actualizarResumen(registrosGuardados);
         }
 
         function guardarRegistro(registros) {
-            const gistId = 'tu_gist_id'; // Reemplaza con tu ID de Gist
-            const gistUrl = `https://api.github.com/gists/${gistId}`;
+            // Guardar registros en el almacenamiento local
+            localStorage.setItem('registros', JSON.stringify(registros));
+        }
 
-            // Guardar registros en GitHub Gists
-            fetch(gistUrl
+        function registrarDatos() {
+            const horas = parseInt(document.getElementById('horas').value);
+            const minutos = parseInt(document.getElementById('minutos').value);
+            const segundos = parseInt(document.getElementById('segundos').value);
+            const velocidad = parseFloat(document.getElementById('velocidad').value);
+
+            if (isNaN(horas) || isNaN(minutos) || isNaN(segundos) || isNaN(velocidad)) {
+                alert('Por favor, ingrese valores numéricos válidos.');
+                return;
+            }
+
+            const tiempoTotalSegundos = horas * 3600 + minutos * 60 + segundos;
+            const velocidadMetrosSegundo = velocidad / 3.6; // Convertir de km/h a m/s
+            const distanciaRecorrida = velocidadMetrosSegundo * tiempoTotalSegundos / 1000; // Convertir de metros a kilómetros
+
+            const table = document.getElementById('registrosTable').getElementsByTagName('tbody')[0];
+            const nuevoRegistro = {
+                numeroEntrada: entradaNumero,
+                tiempo: `${horas}:${minutos}:${segundos}`,
+                velocidad: velocidad,
+                distanciaRecorrida: distanciaRecorrida.toFixed(2),
+            };
+
+            agregarFilaTabla(table, nuevoRegistro);
+
+            // Agregar el nuevo registro a la lista y guardar nuevamente
+            registrosGuardados.push(nuevoRegistro);
+            guardarRegistro(registrosGuardados);
+
+            // Actualizar el resumen
+            actualizarResumen(registrosGuardados);
+
+            entradaNumero++;
+
+            // Limpiar los campos del formulario
+            document.getElementById('horas').value = '';
+            document.getElementById('minutos').value = '';
+            document.getElementById('segundos').value = '';
+            document.getElementById('velocidad').value = '';
+        }
+
+        function agregarFilaTabla(table, registro) {
+            const newRow = table.insertRow();
+            const cellNumeroEntrada = newRow.insertCell(0);
+            const cellTiempo = newRow.insertCell(1);
+            const cellVelocidad = newRow.insertCell(2);
+            const cellDistanciaRecorrida = newRow.insertCell(3);
+
+            cellNumeroEntrada.innerHTML = registro.numeroEntrada;
+            cellTiempo.innerHTML = registro.tiempo;
+            cellVelocidad.innerHTML = registro.velocidad;
+            cellDistanciaRecorrida.innerHTML = registro.distanciaRecorrida;
+        }
+
+        function actualizarResumen(registros) {
+            const totalKilometrosElement = document.getElementById('totalKilometros');
+            const totalHorasElement = document.getElementById('totalHoras');
+            const numeroVecesElement = document.getElementById('numeroVeces');
+
+            const totalKilometros = registros.reduce((total, registro) => total + parseFloat(registro.distanciaRecorrida), 0);
+            const totalHoras = registros.reduce((total, registro) => {
+                const tiempoSplit = registro.tiempo.split(':');
+                return total + parseFloat(tiempoSplit[0]) + parseFloat(tiempoSplit[1]) / 60 + parseFloat(tiempoSplit[2]) / 3600;
+            }, 0);
+
+            totalKilometrosElement.textContent = totalKilometros.toFixed(2);
+            totalHorasElement.textContent = totalHoras.toFixed(2);
+            numeroVecesElement.textContent = registros.length;
+        }
+
+        function generarGraficas(registros) {
+            generarGraficaKilometros(registros);
+            generarGraficaVelocidad(registros);
+        }
+
+        function generarGraficaKilometros(registros) {
+            const sesionesCarrera = registros.map(registro => registro.numeroEntrada);
+            const kilometrosRecorridos = registros.map(registro => parseFloat(registro.distanciaRecorrida));
+
+            const ctx = document.getElementById('graficaKilometros').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sesionesCarrera,
+                    datasets: [{
+                        label: 'Kilómetros Recorridos',
+                        data: kilometrosRecorridos,
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left'
+                        }
+                    }
+                }
+            });
+        }
+
+        function generarGraficaVelocidad(registros) {
+            const sesionesCarrera = registros.map(registro => registro.numeroEntrada);
+            const velocidades = registros.map(registro => parseFloat(registro.velocidad));
+
+            const ctx = document.getElementById('graficaVelocidad').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: sesionesCarrera,
+                    datasets: [{
+                        label: 'Velocidad (km/h)',
+                        data: velocidades,
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1,
+                        fill: false,
+                    }]
+                },
+                options: {
+                    scales: {
+                        x: {
+                            type: 'linear',
+                            position: 'bottom'
+                        },
+                        y: {
+                            type: 'linear',
+                            position: 'left'
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
