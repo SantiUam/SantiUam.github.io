@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mapa del Mundo</title>
+    <style>
+        #map {
+            height: 500px;
+        }
+    </style>
+    <!-- Incluye la biblioteca de Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+</head>
+
+<body>
+
+    <div id="map"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+    <script>
+        // Crea el mapa centrado en el mundo
+        const map = L.map('map').setView([0, 0], 2);
+
+        // Añade la capa de OpenStreetMap
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Datos de los países (nombre, latitud, longitud)
+        const paises = [
+            { nombre: 'España', latitud: 40.4168, longitud: -3.7038, visitado: false },
+            { nombre: 'Estados Unidos', latitud: 37.7749, longitud: -122.4194, visitado: true },
+            { nombre: 'Argentina', latitud: -34.6118, longitud: -58.4173, visitado: false },
+            { nombre: 'Australia', latitud: -35.2820, longitud: 149.1287, visitado: false },
+            { nombre: 'Canadá', latitud: 45.4215, longitud: -75.6993, visitado: false },
+            { nombre: 'China', latitud: 39.9042, longitud: 116.4074, visitado: false },
+            { nombre: 'India', latitud: 28.6139, longitud: 77.2090, visitado: false },
+            { nombre: 'Japón', latitud: 35.6895, longitud: 139.6917, visitado: false },
+            { nombre: 'México', latitud: 19.4326, longitud: -99.1332, visitado: false },
+            { nombre: 'Rusia', latitud: 55.7558, longitud: 37.6176, visitado: false },
+            // Agrega más países según sea necesario
+            // Copia y pega más países de la lista proporcionada
+            { nombre: 'Colombia', latitud: 4.5709, longitud: -74.2973, visitado: false },
+            { nombre: 'Brasil', latitud: -15.7801, longitud: -47.9292, visitado: false },
+            { nombre: 'Alemania', latitud: 51.1657, longitud: 10.4515, visitado: false },
+            { nombre: 'Francia', latitud: 46.6031, longitud: 1.8883, visitado: false },
+            { nombre: 'Italia', latitud: 41.8719, longitud: 12.5674, visitado: false },
+            // Añade más países según sea necesario
+        ];
+
+        // Itera sobre los países y agrega marcadores al mapa
+        paises.forEach(pais => {
+            const marker = L.marker([pais.latitud, pais.longitud]).addTo(map);
+
+            // Agrega un pop-up al marcador
+            marker.bindPopup(`<b>${pais.nombre}</b><br>¿Has visitado este país? <button onclick="preguntarVisita('${pais.nombre}')">Responder</button>`);
+
+            // Cambia el color del marcador según si el país ha sido visitado
+            if (pais.visitado) {
+                marker.setIcon(L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png' }));
+            } else {
+                marker.setIcon(L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png' }));
+            }
+        });
+
+        // Función para preguntar si el país ha sido visitado
+        function preguntarVisita(nombrePais) {
+            const respuesta = confirm(`¿Has visitado ${nombrePais}?`);
+
+            // Actualiza el estado de visita del país
+            const pais = paises.find(p => p.nombre === nombrePais);
+            if (pais) {
+                pais.visitado = respuesta;
+            }
+
+            // Actualiza el color del marcador
+            const marker = map._layers[Object.keys(map._layers).find(key => map._layers[key]._popup && map._layers[key]._popup._content.includes(nombrePais))];
+            if (marker) {
+                if (respuesta) {
+                    marker.setIcon(L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png' }));
+                } else {
+                    marker.setIcon(L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png' }));
+                }
+            }
+        }
+    </script>
+
+</body>
+
+</html>
