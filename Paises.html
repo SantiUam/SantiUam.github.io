@@ -9,12 +9,58 @@
         #map {
             height: 500px;
         }
+
+        #menu {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background-color: #fff;
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #menu label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        #menu select {
+            width: 200px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        #menu select:hover {
+            border-color: #555;
+        }
+
+        #menu select:focus {
+            border-color: #007BFF;
+        }
     </style>
     <!-- Incluye la biblioteca de Leaflet -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 </head>
 
 <body>
+
+    <div id="menu">
+        <label for="paginas">Selecciona una página:</label>
+        <select id="paginas" onchange="cambiarPagina()">
+            <option value="Intro">Intro</option>
+            <option value=" Menu Principal">Menu principal</option>
+            <option value="Viajes">Viajes</option>
+            <option value="Deportes">Deportes</option>
+            <!-- Agrega más opciones según sea necesario -->
+        </select>
+    </div>
 
     <div id="map"></div>
 
@@ -42,7 +88,6 @@
             { nombre: 'México', latitud: 19.4326, longitud: -99.1332, visitado: false },
             { nombre: 'Rusia', latitud: 55.7558, longitud: 37.6176, visitado: false },
             // Agrega más países según sea necesario
-            // Copia y pega más países de la lista proporcionada
             { nombre: 'Colombia', latitud: 4.5709, longitud: -74.2973, visitado: false },
             { nombre: 'Brasil', latitud: -15.7801, longitud: -47.9292, visitado: false },
             { nombre: 'Alemania', latitud: 51.1657, longitud: 10.4515, visitado: false },
@@ -84,6 +129,28 @@
                 } else {
                     marker.setIcon(L.icon({ iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png' }));
                 }
+            }
+        }
+
+        // Función para cambiar de página según la selección del menú desplegable
+        function cambiarPagina() {
+            const select = document.getElementById('paginas');
+            const selectedPage = select.options[select.selectedIndex].value;
+
+            switch (selectedPage) {
+                case 'Intro':
+                    window.location.href = 'Index.html';
+                    break;
+                case 'Menu Principal':
+                    window.location.href = 'index2.html';
+                    break;
+                case 'Viajes':
+                    window.location.href = 'Paises.html';
+                    break;
+                case 'Deportes':
+                    window.location.href = 'Deporte.html';
+                    break;
+                // Agrega más casos según sea necesario
             }
         }
     </script>

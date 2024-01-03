@@ -70,7 +70,16 @@
 </head>
 
 <body>
-
+    <div id="menu">
+        <label for="paginas">Selecciona una página:</label>
+        <select id="paginas" onchange="cambiarPagina()">
+            <option value="Intro">Intro</option>
+            <option value="Menu Principal">Menu principal</option>
+            <option value="Viajes">Viajes</option>
+            <option value="Deportes">Deportes</option>
+            <!-- Agrega más opciones según sea necesario -->
+        </select>
+    </div>
     <h1>Registro de Tiempo y Velocidad</h1>
 
     <form id="registroForm">
@@ -283,6 +292,27 @@
                     }
                 }
             });
+        }
+        // Función para cambiar de página según la selección del menú desplegable
+        function cambiarPagina() {
+            const select = document.getElementById('paginas');
+            const selectedPage = select.options[select.selectedIndex].value;
+
+            switch (selectedPage) {
+                case 'Intro':
+                    window.location.href = 'Index.html';
+                    break;
+                case 'Menu Principal':
+                    window.location.href = 'index2.html';
+                    break;
+                case 'Viajes':
+                    window.location.href = 'Paises.html';
+                    break;
+                case 'Deportes':
+                    window.location.href = 'Deporte.html';
+                    break;
+                // Agrega más casos según sea necesario
+            }
         }
     </script>
 </body>
